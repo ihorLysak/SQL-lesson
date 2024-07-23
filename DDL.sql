@@ -1,0 +1,18 @@
+CREATE TABLE files (
+	id SERIAL PRIMARY KEY,
+	filename VARCHAR(64) NOT NULL,
+	MIME_type VARCHAR(64) NOT NULL,
+	URL VARCHAR(2083) NOT NULL,
+	s3_key VARCHAR(256) NOT NULL
+);
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(64) NOT NULL,
+    first_name VARCHAR(64) NOT NULL,
+    second_name VARCHAR(64) NOT NULL,
+    email VARCHAR(320) NOT NULL UNIQUE,
+    password VARCHAR(64) NOT NULL,
+    FOREIGN KEY (avatar) REFERENCES files(id)
+);
+
