@@ -45,6 +45,19 @@ actors_array AS (
     LEFT JOIN person_photos ON persons.id = person_photos.person_id AND person_photos.is_main = TRUE
     LEFT JOIN files ON person_photos.file_id = files.id
     GROUP BY movie_cast.movie_id
+),
+genres_array AS (
+    SELECT
+        movies_genres.movie_id,
+        JSON_AGG(
+            JSON_BUILD_OBJECT(
+                'genre_id', genres.id,
+                'name', genres.genre
+            )
+        ) AS genres
+    FROM movies_genres
+    JOIN genres ON movies_genres.genre_id = genres.id
+    GROUP BY movies_genres.movie_id
 )
 SELECT 
     movies.id, 
@@ -71,9 +84,11 @@ SELECT
             's3_key', filtered_directors.main_photo->>'s3_key'
         )
     ) AS director,
-    actors_array.actors
+    actors_array.actors,
+    genres_array.genres
 FROM movies
 LEFT JOIN filtered_files ON filtered_files.id = movies.poster_id
 LEFT JOIN filtered_directors ON filtered_directors.person_id = movies.director_id
 LEFT JOIN actors_array ON actors_array.movie_id = movies.id
+LEFT JOIN genres_array ON genres_array.movie_id = movies.id
 WHERE movies.id = 1;
